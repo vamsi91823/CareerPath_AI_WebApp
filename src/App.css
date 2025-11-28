@@ -1,0 +1,80 @@
+/* FULL SCREEN BACKGROUND */
+.login-container {
+  height: 100vh;
+  width: 100%;
+  background-image: url("Careerpath-logo.svg"); /* Your background image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* Optional: dark overlay to make login box pop */
+  position: relative;
+}
+
+.login-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0,0,0,0.3); /* dim the background slightly */
+  z-index: 0;
+}
+
+/* LOGIN BOX (GLASS EFFECT) */
+.login-box {
+  position: relative; /* above overlay */
+  z-index: 1;
+
+  background: rgba(255, 255, 255, 0.15); /* transparent */
+  backdrop-filter: blur(15px);          /* frosted glass */
+  -webkit-backdrop-filter: blur(15px);  /* Safari support */
+
+  padding: 40px;
+  border-radius: 15px;
+  width: 320px;
+  text-align: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+.login-box h2 {
+  color: white;
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+/* INPUT FIELDS */
+.login-input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+/* LOGIN BUTTON */
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  background-color: rgba(0,120,255,0.8); /* semi-transparent button */
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  background-color: rgba(0,120,255,1); /* full color on hover */
+}
