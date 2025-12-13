@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
+import TopRightSignOut from "./TopRightSignOut";
 
 const steps = ["Profile", "Skills", "Interests", "Goals", "Experience"];
 
@@ -22,7 +23,8 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     skills: "",
     interests: "",
@@ -35,9 +37,28 @@ export default function Profile() {
   };
 
   const handleNext = () => {
-    // when user finishes the profile wizard, take them to the dashboard
-    if (activeStep === steps.length - 1) navigate("/dashboard");
-    else setActiveStep((prev) => prev + 1);
+    if (activeStep === steps.length - 1) {
+      try {
+        const normalized = {
+          fullName: `${profile.firstName} ${profile.lastName}`.trim(),
+          email: profile.email,
+          skills: profile.skills
+            ? profile.skills.split(",").map((s) => s.trim()).filter(Boolean)
+            : [],
+          interests: profile.interests
+            ? profile.interests.split(",").map((s) => s.trim()).filter(Boolean)
+            : [],
+          careerGoals: profile.goals,
+          experience: profile.experience,
+        };
+        localStorage.setItem("userProfile", JSON.stringify(normalized));
+      } catch (e) {
+        console.error("Failed to save profile", e);
+      }
+      navigate("/dashboard");
+    } else {
+      setActiveStep((prev) => prev + 1);
+    }
   };
 
   const handleBack = () => {
@@ -64,17 +85,26 @@ export default function Profile() {
               Profile
             </Typography>
 
-            <Typography sx={{ mb: 3, fontSize: 14, color: "#000" }}>
+            <Typography sx={{ mb: 3, fontSize: 14 }}>
               Let’s start with your basic information
             </Typography>
 
             <TextField
               fullWidth
-              label="Full Name"
+              label="First Name"
               margin="normal"
               {...commonStyles}
-              value={profile.fullName}
-              onChange={handleChange("fullName")}
+              value={profile.firstName}
+              onChange={handleChange("firstName")}
+            />
+
+            <TextField
+              fullWidth
+              label="Last Name"
+              margin="normal"
+              {...commonStyles}
+              value={profile.lastName}
+              onChange={handleChange("lastName")}
             />
 
             <TextField
@@ -91,10 +121,10 @@ export default function Profile() {
       case 1:
         return (
           <>
-            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1, color: "#000" }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Skills
             </Typography>
-            <Typography sx={{ mb: 3, fontSize: 14, color: "#000" }}>
+            <Typography sx={{ mb: 3, fontSize: 14 }}>
               Tell us about your current skills or technologies you know.
             </Typography>
 
@@ -102,7 +132,7 @@ export default function Profile() {
               fullWidth
               multiline
               minRows={3}
-              label="Skills"
+              label="Primary Skills"
               margin="normal"
               {...commonStyles}
               value={profile.skills}
@@ -114,10 +144,10 @@ export default function Profile() {
       case 2:
         return (
           <>
-            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1, color: "#000" }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Interests
             </Typography>
-            <Typography sx={{ mb: 3, fontSize: 14, color: "#000" }}>
+            <Typography sx={{ mb: 3, fontSize: 14 }}>
               What kind of roles or domains are you most interested in?
             </Typography>
 
@@ -125,7 +155,7 @@ export default function Profile() {
               fullWidth
               multiline
               minRows={3}
-              label="Interests"
+              label="Secondary Skills"
               margin="normal"
               {...commonStyles}
               value={profile.interests}
@@ -137,11 +167,11 @@ export default function Profile() {
       case 3:
         return (
           <>
-            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1, color: "#000" }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Goals
             </Typography>
 
-            <Typography sx={{ mb: 3, fontSize: 14, color: "#000" }}>
+            <Typography sx={{ mb: 3, fontSize: 14 }}>
               Describe your short-term and long-term career goals.
             </Typography>
 
@@ -161,11 +191,11 @@ export default function Profile() {
       case 4:
         return (
           <>
-            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1, color: "#000" }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Experience
             </Typography>
 
-            <Typography sx={{ mb: 3, fontSize: 14, color: "#000" }}>
+            <Typography sx={{ mb: 3, fontSize: 14 }}>
               Share your current role, years of experience, or education.
             </Typography>
 
@@ -192,70 +222,34 @@ export default function Profile() {
       sx={{
         minHeight: "100vh",
         background: "linear-gradient(to bottom right, #d4edf1ff, #acd2ebd8)",
-        color: "#000",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         py: 6,
       }}
     >
+      <TopRightSignOut />
       <Container maxWidth="md">
-        {/* Logo + Title */}
         <Box textAlign="center" mb={3}>
           <Avatar
             src={logo}
-            sx={{
-              width: 64,
-              height: 64,
-              margin: "0 auto",
-              borderRadius: 4,
-              boxShadow: 4,
-              mb: 1,
-            }}
+            sx={{ width: 64, height: 64, margin: "0 auto", mb: 1 }}
           />
-
-          <Typography variant="h5" sx={{ fontFamily: "'Pacifico', cursive", color: "#000" }}>
-            CareerPath AI
-          </Typography>
-
-          <Typography variant="h4" sx={{ fontWeight: 700, color: "#000", fontFamily: "Quicksand" }}>
+          <Typography variant="h5">CareerPath AI</Typography>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
             Create Your Profile
           </Typography>
-
-          <Typography sx={{ color: "#000", fontFamily: "Quicksand" }}>
-            Help us understand you better to provide personalized career recommendations
-          </Typography>
         </Box>
 
-        {/* Stepper */}
-        <Box mb={3}>
-          <Stepper
-            activeStep={activeStep}
-            alternativeLabel
-            sx={{
-              "& .MuiStepLabel-label": { color: "#000", fontFamily: "Quicksand" },
-              "& .MuiStepIcon-root": { color: "#000" },
-              "& .Mui-active .MuiStepIcon-root": { color: "#000" },
-              "& .Mui-completed .MuiStepIcon-root": { color: "#000" },
-            }}
-          >
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel />
-              </Step>
-            ))}
-          </Stepper>
-        </Box>
+        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel />
+            </Step>
+          ))}
+        </Stepper>
 
-        {/* Main Card */}
-        <Card
-          sx={{
-            backgroundColor: "#ffffff",
-            borderRadius: 3,
-            boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-            p: 3,
-          }}
-        >
+        <Card sx={{ p: 3, borderRadius: 3 }}>
           {renderStepContent()}
 
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
@@ -263,33 +257,11 @@ export default function Profile() {
               variant="outlined"
               disabled={activeStep === 0}
               onClick={handleBack}
-              sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                borderColor: "#000",
-                color: "#000",
-                px: 2.5,
-                "&:hover": {
-                  borderColor: "#000",
-                  backgroundColor: "#e5e7eb",
-                },
-              }}
             >
               ← Previous
             </Button>
 
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                px: 3,
-                backgroundColor: "#000",
-                color: "#fff",
-                "&:hover": { backgroundColor: "#222" },
-              }}
-            >
+            <Button variant="contained" onClick={handleNext}>
               {activeStep === steps.length - 1 ? "Finish" : "Next →"}
             </Button>
           </Box>
@@ -297,48 +269,19 @@ export default function Profile() {
 
         {/* Footer */}
         <Box textAlign="center" mt={3}>
-          <Typography sx={{ fontSize: 13, color: "#000" }}>
+          <Typography fontSize={13}>
             Step {activeStep + 1} of {steps.length}
           </Typography>
 
-          <Box sx={{ mt: 1, display: "flex", justifyContent: "center", gap: 2 }}>
-            <Typography
-              sx={{
-                fontSize: 14,
-                cursor: "pointer",
-                textDecoration: "underline",
-                color: "#000",
-              }}
-              onClick={() => navigate(-1)}
-            >
-              ← Previous page
-            </Typography>
-
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ cursor: "pointer", color: "#000", textDecoration: "underline" }}
-              onClick={() => navigate("/")}
-              aria-label="Back to Home"
-            >
-              <Typography sx={{ fontSize: 14 }}>Back to Home</Typography>
-
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="M3 11.5L12 4l9 7.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M9 21V12h6v9" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            
-            </Stack>
-          </Box>
+          <Stack
+            direction="row"
+            justifyContent="center"
+            mt={1}
+            sx={{ cursor: "pointer", textDecoration: "underline" }}
+            onClick={() => navigate("/")}
+          >
+            <Typography>Back to Home</Typography>
+          </Stack>
         </Box>
       </Container>
     </Box>

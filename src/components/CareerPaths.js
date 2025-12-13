@@ -1,5 +1,5 @@
 // src/components/CareerPaths.js
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -12,6 +12,11 @@ import {
   Link,
   IconButton,
   Grow,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
 } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import TwitterIcon from "@mui/icons-material/Twitter";
@@ -19,6 +24,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
+import careerAssets from "../data/careerAssets";
+import DemoPlayer from "./DemoPlayer";
 
 export default function CareerPaths() {
   const navigate = useNavigate();
@@ -30,6 +37,11 @@ export default function CareerPaths() {
   const goToSignin = () => {
     navigate("/login"); // go to the LoginPage route (/login)
   };
+
+  const [demoOpen, setDemoOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerTitle, setDrawerTitle] = useState("");
+  const [drawerPath, setDrawerPath] = useState([]);
 
   const stats = [
     {
@@ -276,16 +288,22 @@ export default function CareerPaths() {
                   textTransform: "none",
                   fontFamily: "Quicksand",
                 }}
+                onClick={() => {
+                  setDemoOpen(true);
+                }}
               >
                 Watch Demo
               </Button>
             </Stack>
+
+            {/* Learn Path removed per request */}
 
             {/* Removed "Don't have an account? Sign up here" line */}
               </Box>
             </Grow>
           </Grid>
 
+          {/* Video modal */}
           {/* Right stats */}
           <Grid item xs={12} md={6}>
             <Grid container spacing={2}>
@@ -366,6 +384,43 @@ export default function CareerPaths() {
           </Grid>
         </Grid>
       </Container>
+      {/* Video modal */}
+      <DemoPlayer open={demoOpen} onClose={() => setDemoOpen(false)} totalSeconds={300} />
+      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Box sx={{ width: { xs: 300, sm: 420 }, p: 2 }} role="presentation">
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>{drawerTitle}</Typography>
+          <Divider />
+          <List>
+            {drawerPath && drawerPath.length > 0 ? (
+              drawerPath.map((item, idx) => (
+                <ListItem key={idx} alignItems="flex-start">
+                  <ListItemText
+                    primary={`${item.step}`}
+                    secondary={
+                      item.resources ? (
+                        <Box sx={{ mt: 0.5 }}>
+                          {item.resources.map((r, i) => (
+                            <Typography key={i} variant="body2">
+                              <Link href={r} target="_blank" rel="noopener noreferrer">{r}</Link>
+                            </Typography>
+                          ))}
+                        </Box>
+                      ) : null
+                    }
+                  />
+                </ListItem>
+              ))
+            ) : (
+              <ListItem>
+                <ListItemText primary="No learning path available." />
+              </ListItem>
+            )}
+          </List>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Button onClick={() => setDrawerOpen(false)}>Close</Button>
+          </Box>
+        </Box>
+      </Drawer>
 
       {/* FEATURES SECTION */}
       <Box
@@ -636,9 +691,16 @@ export default function CareerPaths() {
                 sx={{
                   textTransform: "none",
                   fontFamily: "Quicksand",
+                  ml: 2,
+                }}
+                onClick={() => {
+                  const asset = (careerAssets && careerAssets['Data Scientist']) || Object.values(careerAssets)[0];
+                  setDrawerTitle('Data Scientist - Learn Path');
+                  setDrawerPath(asset.learnPath || []);
+                  setDrawerOpen(true);
                 }}
               >
-                Learn More
+                Learn Path
               </Button>
             </Stack>
           </Card>

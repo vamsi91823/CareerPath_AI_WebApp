@@ -1,30 +1,36 @@
-import React, { useState } from "react";
+// Service helpers for calling the backend AI recommendation endpoint.
 
-function App() {
-  const [result, setResult] = useState("");
+async function getCareerRecommendations(profile) {
+  // profile should be a plain object with user fields.
+  try {
+    const res = await fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile),
+    });
 
-  const callBackend = () => {
-    fetch("http://localhost:5000/api/message")
-      .then((response) => response.json())
-      .then((data) => {
-        setResult(data.message);
-      })
-      .catch((error) => {
-        setResult("Error calling API");
-      });
-  };
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Server error: ${res.status} ${text}`);
+    }
 
-  return (
-    <div style={{ padding: "40px" }}>
-      <h2>Frontend AJAX Call (React + fetch)</h2>
-
-      <button onClick={callBackend}>
-        Call Backend
-      </button>
-
-      <p>{result}</p>
-    </div>
-  );
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('getCareerRecommendations error:', err);
+    throw err;
+  }
 }
 
-export default App;
+async function healthCheck() {
+  try {
+    const res = await fetch('/api/message');
+    if (!res.ok) return false;
+    const j = await res.json();
+    return !!j.message;
+  } catch (err) {
+    return false;
+  }
+}
+
+export { getCareerRecommendations, healthCheck };

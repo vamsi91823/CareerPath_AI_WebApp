@@ -12,11 +12,13 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
+import TopRightSignOut from "./TopRightSignOut";
 
 export default function SignupPage() {
   const navigate = useNavigate();
 
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,7 +27,7 @@ export default function SignupPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!fullName || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       setMessage("error");
       return;
     }
@@ -54,6 +56,7 @@ export default function SignupPage() {
         p: 2,
       }}
     >
+      <TopRightSignOut />
       <Box sx={{ width: 420 }}>
         {/* Back to Home */}
         <Box
@@ -146,12 +149,21 @@ export default function SignupPage() {
           {/* Form */}
           <form onSubmit={handleSubmit}>
             <TextField
-              label="Full Name"
-              placeholder="John Doe"
+              label="First Name"
+              placeholder="John"
               fullWidth
               margin="normal"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+
+            <TextField
+              label="Last Name"
+              placeholder="Doe"
+              fullWidth
+              margin="normal"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
             />
 
             <TextField

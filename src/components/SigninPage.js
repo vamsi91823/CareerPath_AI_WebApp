@@ -13,6 +13,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
+import TopRightSignOut from "./TopRightSignOut";
 
 export default function SigninPage() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function SigninPage() {
         p: 2,
       }}
     >
+      <TopRightSignOut />
       <Container maxWidth="sm">
         {/* Back to Home */}
         <Stack
