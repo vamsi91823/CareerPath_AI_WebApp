@@ -14,6 +14,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
+import TopRightSignOut from "./TopRightSignOut";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -47,6 +48,7 @@ export default function LoginPage() {
         p: 2,
       }}
     >
+      <TopRightSignOut />
       <Box sx={{ width: 400 }}>
         {/* Back to Home */}
         <Box

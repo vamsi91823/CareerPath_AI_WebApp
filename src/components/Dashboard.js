@@ -1,4 +1,6 @@
 import React from "react";
+import CareerRecommendation from "./CareerRecommendation";
+import TopRightSignOut from "./TopRightSignOut";
 import {
 	Box,
 	Grid,
@@ -21,26 +23,6 @@ import {
 // curated learning resources and visual progress indicators.
 export default function Dashboard() {
 	// Sample/mock data — replace these with API-driven values later.
-	const careerPaths = [
-		{
-			title: "AI / ML Engineer",
-			match: 78,
-			level: "High Potential",
-			description: "Work on ML models, data pipelines and deployable AI features.",
-		},
-		{
-			title: "Data Analyst",
-			match: 65,
-			level: "Good Fit",
-			description: "Analyze business data, build dashboards and run experiments.",
-		},
-		{
-			title: "Full-Stack Developer",
-			match: 52,
-			level: "Moderate Fit",
-			description: "Ship features end-to-end across frontend and backend.",
-		},
-	];
 
 	const skillGaps = [
 		{ skill: "Python for Data Science", current: 40, required: 80 },
@@ -72,6 +54,7 @@ export default function Dashboard() {
 				color: "#0f172a",
 			}}
 		>
+			<TopRightSignOut />
 			<Typography variant="h4" component="h1" fontWeight={800} sx={{ mb: 1 }}>
 				Progress Tracking Dashboard
 			</Typography>
@@ -82,36 +65,30 @@ export default function Dashboard() {
 			</Typography>
 
 			<Grid container spacing={3}>
-				{/* Recommended Career Paths */}
+				{/* Recommended Career Paths (AI-powered) */}
 				<Grid item xs={12} md={6}>
-					<Card sx={{ height: "100%" }}>
-						<CardHeader title="Recommended Career Paths" />
-						<CardContent>
-							<Stack spacing={2}>
-								{careerPaths.map((p, i) => (
-									<Box key={p.title} sx={{ borderRadius: 2, p: 2, border: "1px solid rgba(0,0,0,0.06)" }}>
-										<Stack direction="row" justifyContent="space-between" alignItems="center">
-											<Box>
-												<Typography fontWeight={700}>{p.title}</Typography>
-												<Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{p.description}</Typography>
-											</Box>
+					{/* Load profile saved from Profile wizard (fallback to demo) */}
+					{(() => {
+						let stored = null;
+						try {
+							stored = JSON.parse(localStorage.getItem('userProfile'));
+						} catch (e) {
+							stored = null;
+						}
 
-											<Stack direction="column" spacing={1} alignItems="flex-end">
-												<Chip label={p.level} size="small" color={i === 0 ? "primary" : "default"} />
-												<Typography variant="caption" color="text.secondary">Match: {p.match}%</Typography>
-											</Stack>
-										</Stack>
+						const demo = {
+							fullName: "Jane Doe",
+							yearsExperience: 3,
+							currentRole: "Junior Data Analyst",
+							skills: ["SQL", "Excel", "Tableau"],
+							interests: ["Machine Learning", "Data Science"],
+							careerGoals: "Become an ML Engineer",
+							education: { degree: "BSc", field: "Computer Science" },
+							location: "Remote",
+						};
 
-										<LinearProgress variant="determinate" value={p.match} sx={{ mt: 2, height: 8, borderRadius: 3 }} />
-										<Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-											<Button size="small" variant="contained">View Path</Button>
-											<Button size="small" variant="outlined">Add to Plan</Button>
-										</Stack>
-									</Box>
-								))}
-							</Stack>
-						</CardContent>
-					</Card>
+						return <CareerRecommendation profile={stored || demo} />;
+					})()}
 				</Grid>
 
 				{/* Skill Gaps */}
