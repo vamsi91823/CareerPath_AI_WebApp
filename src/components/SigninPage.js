@@ -9,45 +9,24 @@ import {
   Card,
   Stack,
 } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
+import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
-import { signInUser } from "../Services/userService";
 
 export default function SigninPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("RVSSN@gmail.com");
+  const [password, setPassword] = useState("1234");
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Please enter email and password");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const response = await signInUser({
-        email,
-        password,
-      });
-
-      // Save token
-      localStorage.setItem("token", response.data.token);
-
-      alert("Login Successful");
+  const handleLogin = () => {
+    if (email === "RVSSN@gmail.com" && password === "1234") {
+      // after successful login go to Profile page
       navigate("/profile");
-    } catch (error) {
-      alert(
-        error?.response?.data?.message || "Invalid email or password"
-      );
-    } finally {
-      setLoading(false);
+    } else {
+      alert("Invalid Credentials");
     }
   };
 
@@ -63,7 +42,6 @@ export default function SigninPage() {
       }}
     >
       <TopRightSignOut />
-
       <Container maxWidth="sm">
         {/* Back to Home */}
         <Stack
@@ -74,22 +52,13 @@ export default function SigninPage() {
           onClick={() => navigate("/")}
         >
           <ArrowBackIosNewIcon fontSize="small" />
-          <Typography
-            sx={{
-              fontFamily: "Quicksand",
-              color: "#0f172a",
-              fontSize: 15,
-            }}
-          >
+          <Typography sx={{ fontFamily: "Quicksand", color: "#0f172a", fontSize: 15 }}>
             Back to Home
           </Typography>
-          <HomeIcon
-            sx={{ fontSize: 18, color: "#0f172a" }}
-            aria-hidden="true"
-          />
+          <HomeIcon className="home-icon-anim" sx={{ fontSize: 18, color: '#0f172a' }} aria-hidden="true" />
         </Stack>
 
-        {/* Logo */}
+        {/* Logo + Branding */}
         <Stack alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <img
             src={logo}
@@ -159,7 +128,6 @@ export default function SigninPage() {
             variant="contained"
             fullWidth
             onClick={handleLogin}
-            disabled={loading}
             sx={{
               py: 1.2,
               borderRadius: 2,
@@ -172,7 +140,7 @@ export default function SigninPage() {
               },
             }}
           >
-            {loading ? "Signing In..." : "Sign In"}
+            Sign In
           </Button>
         </Card>
       </Container>

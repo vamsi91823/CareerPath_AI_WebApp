@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -15,7 +15,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
-import { getProfileDetails, saveUserProfile } from "../Services/userService";
 
 const steps = ["Profile", "Skills", "Interests", "Goals", "Experience"];
 
@@ -33,40 +32,15 @@ export default function Profile() {
     experience: "",
   });
 
-  // 🔹 Load profile from backend (if exists)
-  useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const res = await getProfileDetails();
-        if (res?.data) {
-          setProfile({
-            firstName: res.data.firstName || "",
-            lastName: res.data.lastName || "",
-            email: res.data.email || "",
-            skills: (res.data.skills || []).join(", "),
-            interests: (res.data.interests || []).join(", "),
-            goals: res.data.careerGoals || "",
-            experience: res.data.experience || "",
-          });
-        }
-      } catch (e) {
-        console.log("No profile found, starting fresh");
-      }
-    };
-
-    loadProfile();
-  }, []);
-
   const handleChange = (field) => (e) => {
     setProfile((prev) => ({ ...prev, [field]: e.target.value }));
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (activeStep === steps.length - 1) {
       try {
         const normalized = {
-          firstName: profile.firstName,
-          lastName: profile.lastName,
+          fullName: `${profile.firstName} ${profile.lastName}`.trim(),
           email: profile.email,
           skills: profile.skills
             ? profile.skills.split(",").map((s) => s.trim()).filter(Boolean)
@@ -77,16 +51,10 @@ export default function Profile() {
           careerGoals: profile.goals,
           experience: profile.experience,
         };
-
-        // 🔹 Save to backend
-        await saveUserProfile(normalized);
-
-        // 🔹 Optional local cache
         localStorage.setItem("userProfile", JSON.stringify(normalized));
       } catch (e) {
         console.error("Failed to save profile", e);
       }
-
       navigate("/dashboard");
     } else {
       setActiveStep((prev) => prev + 1);
@@ -113,9 +81,10 @@ export default function Profile() {
       case 0:
         return (
           <>
-            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
+            <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1, color: "#000" }}>
               Profile
             </Typography>
+
             <Typography sx={{ mb: 3, fontSize: 14 }}>
               Let’s start with your basic information
             </Typography>
@@ -201,6 +170,7 @@ export default function Profile() {
             <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Goals
             </Typography>
+
             <Typography sx={{ mb: 3, fontSize: 14 }}>
               Describe your short-term and long-term career goals.
             </Typography>
@@ -224,6 +194,7 @@ export default function Profile() {
             <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
               Experience
             </Typography>
+
             <Typography sx={{ mb: 3, fontSize: 14 }}>
               Share your current role, years of experience, or education.
             </Typography>
@@ -296,6 +267,7 @@ export default function Profile() {
           </Box>
         </Card>
 
+        {/* Footer */}
         <Box textAlign="center" mt={3}>
           <Typography fontSize={13}>
             Step {activeStep + 1} of {steps.length}
