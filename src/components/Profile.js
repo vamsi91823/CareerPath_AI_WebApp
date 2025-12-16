@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
@@ -11,25 +11,16 @@ import {
   Step,
   StepLabel,
   Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
-import { getProfileDetails, saveUserProfile } from "../Services/userService";
 
 const steps = ["Profile", "Skills", "Interests", "Goals", "Experience"];
 
 export default function Profile() {
   const [activeStep, setActiveStep] = useState(0);
   const navigate = useNavigate();
-
-  const [profileExists, setProfileExists] = useState(false);
-  const [mode, setMode] = useState("create"); // create | view | edit
-  const [foundDialogOpen, setFoundDialogOpen] = useState(false);
 
   const [profile, setProfile] = useState({
     firstName: "",
@@ -40,34 +31,6 @@ export default function Profile() {
     goals: "",
     experience: "",
   });
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await getProfileDetails();
-        // Expecting an object or null
-        if (mounted && res && Object.keys(res).length) {
-          // Normalize fields into local form
-          setProfile({
-            firstName: res.firstName || res.fullName?.split(" ")?.[0] || "",
-            lastName: res.lastName || (res.fullName ? res.fullName.split(" ").slice(1).join(" ") : ""),
-            email: res.email || "",
-            skills: Array.isArray(res.skills) ? res.skills.join(", ") : (res.skills || ""),
-            interests: Array.isArray(res.interests) ? res.interests.join(", ") : (res.interests || ""),
-            goals: res.careerGoals || res.goals || "",
-            experience: res.experience || "",
-          });
-          setProfileExists(true);
-          setMode("view");
-          setFoundDialogOpen(true);
-        }
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
 
   const handleChange = (field) => (e) => {
     setProfile((prev) => ({ ...prev, [field]: e.target.value }));
@@ -89,14 +52,6 @@ export default function Profile() {
           experience: profile.experience,
         };
         localStorage.setItem("userProfile", JSON.stringify(normalized));
-        // Persist to backend if available
-        (async () => {
-          try {
-            await saveUserProfile(normalized);
-          } catch (e) {
-            // ignore backend save errors for now
-          }
-        })();
       } catch (e) {
         console.error("Failed to save profile", e);
       }
@@ -131,7 +86,7 @@ export default function Profile() {
             </Typography>
 
             <Typography sx={{ mb: 3, fontSize: 14 }}>
-              Letâs start with your basic information
+              Let’s start with your basic information
             </Typography>
 
             <TextField
@@ -274,25 +229,6 @@ export default function Profile() {
       }}
     >
       <TopRightSignOut />
-      {/* Dialog shown when an existing profile is found */}
-      <Dialog open={foundDialogOpen} onClose={() => setFoundDialogOpen(false)}>
-        <DialogTitle>Existing Profile Found</DialogTitle>
-        <DialogContent>
-          We found an existing profile. Would you like to keep it as-is or edit it now?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setFoundDialogOpen(false); navigate('/dashboard'); }}>
-            Keep
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => { setFoundDialogOpen(false); setMode('edit'); setActiveStep(0); }}
-          >
-            Edit
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       <Container maxWidth="md">
         <Box textAlign="center" mb={3}>
           <Avatar
@@ -301,52 +237,35 @@ export default function Profile() {
           />
           <Typography variant="h5">CareerPath AI</Typography>
           <Typography variant="h4" sx={{ fontWeight: 700 }}>
-            {mode === 'view' ? 'Your Profile' : (mode === 'edit' ? 'Edit Your Profile' : 'Create Your Profile')}
+            Create Your Profile
           </Typography>
         </Box>
 
-        {mode === 'view' && profileExists ? (
-          <Card sx={{ p: 3, borderRadius: 3 }}>
-            <Typography sx={{ mb: 1, fontWeight: 700 }}>{profile.firstName} {profile.lastName}</Typography>
-            <Typography sx={{ mb: 1 }}>{profile.email}</Typography>
-            <Typography sx={{ mb: 1 }}>Skills: {profile.skills}</Typography>
-            <Typography sx={{ mb: 1 }}>Interests: {profile.interests}</Typography>
-            <Typography sx={{ mb: 1 }}>Goals: {profile.goals}</Typography>
-            <Typography sx={{ mb: 1 }}>Experience: {profile.experience}</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button variant="outlined" onClick={() => navigate('/dashboard')} sx={{ mr: 1 }}>Keep</Button>
-              <Button variant="contained" onClick={() => { setMode('edit'); setActiveStep(0); }}>Edit Profile</Button>
-            </Box>
-          </Card>
-        ) : (
-          <>
-            <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel />
-                </Step>
-              ))}
-            </Stepper>
+        <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 3 }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel />
+            </Step>
+          ))}
+        </Stepper>
 
-            <Card sx={{ p: 3, borderRadius: 3 }}>
-              {renderStepContent()}
+        <Card sx={{ p: 3, borderRadius: 3 }}>
+          {renderStepContent()}
 
-              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-                <Button
-                  variant="outlined"
-                  disabled={activeStep === 0}
-                  onClick={handleBack}
-                >
-                  â Previous
-                </Button>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+            <Button
+              variant="outlined"
+              disabled={activeStep === 0}
+              onClick={handleBack}
+            >
+              ← Previous
+            </Button>
 
-                <Button variant="contained" onClick={handleNext}>
-                  {activeStep === steps.length - 1 ? "Finish" : "Next â"}
-                </Button>
-              </Box>
-            </Card>
-          </>
-        )}
+            <Button variant="contained" onClick={handleNext}>
+              {activeStep === steps.length - 1 ? "Finish" : "Next →"}
+            </Button>
+          </Box>
+        </Card>
 
         {/* Footer */}
         <Box textAlign="center" mt={3}>
