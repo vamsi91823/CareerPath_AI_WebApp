@@ -13,6 +13,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
+import { signUpUser } from "../Services/userService";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -22,9 +23,11 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(""); // "", "error", "mismatch", "success"
 
-  const handleSubmit = (e) => {
+  const [message, setMessage] = useState(""); // error | mismatch | success | apiError
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
@@ -37,12 +40,27 @@ export default function SignupPage() {
       return;
     }
 
-    setMessage("success");
+    try {
+      setLoading(true);
+      setMessage("");
 
-    setTimeout(() => {
-      // after creating account you can go to profile wizard
-      navigate("/profile");
-    }, 800);
+      await signUpUser({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+
+      setMessage("success");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    } catch (error) {
+      setMessage("apiError");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,6 +75,7 @@ export default function SignupPage() {
       }}
     >
       <TopRightSignOut />
+
       <Box sx={{ width: 420 }}>
         {/* Back to Home */}
         <Box
@@ -117,6 +136,7 @@ export default function SignupPage() {
           >
             Create Account
           </Typography>
+
           <Typography
             sx={{
               mb: 2,
@@ -135,14 +155,22 @@ export default function SignupPage() {
               Please fill in all fields.
             </Alert>
           )}
+
           {message === "mismatch" && (
             <Alert severity="error" sx={{ mb: 2 }}>
               Password and Confirm Password do not match.
             </Alert>
           )}
+
+          {message === "apiError" && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              Email already exists or server error.
+            </Alert>
+          )}
+
           {message === "success" && (
             <Alert severity="success" sx={{ mb: 2 }}>
-              Account created successfully! Redirecting...
+              Account created successfully! Redirecting to login…
             </Alert>
           )}
 
@@ -150,7 +178,6 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit}>
             <TextField
               label="First Name"
-              placeholder="John"
               fullWidth
               margin="normal"
               value={firstName}
@@ -159,7 +186,6 @@ export default function SignupPage() {
 
             <TextField
               label="Last Name"
-              placeholder="Doe"
               fullWidth
               margin="normal"
               value={lastName}
@@ -168,7 +194,6 @@ export default function SignupPage() {
 
             <TextField
               label="Email"
-              placeholder="you@example.com"
               fullWidth
               margin="normal"
               value={email}
@@ -196,6 +221,7 @@ export default function SignupPage() {
             <Button
               fullWidth
               type="submit"
+              disabled={loading}
               sx={{
                 mt: 3,
                 py: 1.5,
@@ -209,12 +235,12 @@ export default function SignupPage() {
                 },
               }}
             >
-              Create Account
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
         </Card>
 
-        {/* Footer text */}
+        {/* Footer */}
         <Typography
           textAlign="center"
           mt={2}
