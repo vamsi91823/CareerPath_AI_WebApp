@@ -1,4 +1,4 @@
-import axios from "axios";
+<!-- import axios from "axios";
 
 const API = axios.create({
   baseURL: "https://careerpathai-api.onrender.com/api",
@@ -16,4 +16,4 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-export default API;
+export default API; -->
