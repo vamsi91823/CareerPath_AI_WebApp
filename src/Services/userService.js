@@ -1,4 +1,4 @@
-<!-- import API from "./api"; -->
+
 
 // Signup
 const BASE_URL = `https://careerpathai-api.onrender.com/api/users`;
@@ -84,10 +84,4 @@ export async function fetchUserProfileDetails() {
 }
 
 
-<!-- // Save or update user profile
-export const saveUserProfile = (data) =>
-  API.post("/users/profile", data);
 
-// Test
-export const testAPI = () =>
-  API.get("/users/route-test"); -->
