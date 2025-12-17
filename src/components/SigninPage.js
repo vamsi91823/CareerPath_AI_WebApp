@@ -8,25 +8,47 @@ import {
   Button,
   Card,
   Stack,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
-import HomeIcon from '@mui/icons-material/Home';
+import HomeIcon from "@mui/icons-material/Home";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
+import { signInUser } from "../Services/userService";
 
 export default function SigninPage() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("RVSSN@gmail.com");
-  const [password, setPassword] = useState("1234");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (email === "RVSSN@gmail.com" && password === "1234") {
-      // after successful login go to Profile page
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    setError("");
+
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await signInUser({ email, password });
+
+      // Store auth data
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("uid", res.uid);
+      localStorage.setItem("email", res.email);
+
       navigate("/profile");
-    } else {
-      alert("Invalid Credentials");
+    } catch (err) {
+      setError(err.message || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,13 +74,13 @@ export default function SigninPage() {
           onClick={() => navigate("/")}
         >
           <ArrowBackIosNewIcon fontSize="small" />
-          <Typography sx={{ fontFamily: "Quicksand", color: "#0f172a", fontSize: 15 }}>
+          <Typography sx={{ fontFamily: "Quicksand", fontSize: 15 }}>
             Back to Home
           </Typography>
-          <HomeIcon className="home-icon-anim" sx={{ fontSize: 18, color: '#0f172a' }} aria-hidden="true" />
+          <HomeIcon sx={{ fontSize: 18 }} />
         </Stack>
 
-        {/* Logo + Branding */}
+        {/* Logo */}
         <Stack alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <img
             src={logo}
@@ -76,19 +98,12 @@ export default function SigninPage() {
             sx={{
               fontWeight: 700,
               fontFamily: "'Pacifico', cursive",
-              color: "#0f172a",
             }}
           >
             CareerPath AI
           </Typography>
 
-          <Typography
-            sx={{
-              color: "#4b5563",
-              fontSize: 15,
-              fontFamily: "Quicksand",
-            }}
-          >
+          <Typography sx={{ color: "#4b5563", fontFamily: "Quicksand" }}>
             Your intelligent career guidance platform
           </Typography>
         </Stack>
@@ -106,6 +121,12 @@ export default function SigninPage() {
           >
             Sign In
           </Typography>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
 
           <TextField
             label="Email"
@@ -128,6 +149,7 @@ export default function SigninPage() {
             variant="contained"
             fullWidth
             onClick={handleLogin}
+            disabled={loading}
             sx={{
               py: 1.2,
               borderRadius: 2,
@@ -135,12 +157,9 @@ export default function SigninPage() {
               fontFamily: "Quicksand",
               fontWeight: 600,
               background: "linear-gradient(to right, #1976d2, #00b0ff)",
-              "&:hover": {
-                background: "linear-gradient(to right, #1976d2, #00b0ff)",
-              },
             }}
           >
-            Sign In
+            {loading ? <CircularProgress size={22} /> : "Sign In"}
           </Button>
         </Card>
       </Container>

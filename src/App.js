@@ -3,7 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import CareerPaths from "./components/CareerPaths";
-import LoginPage from "./components/LoginPage";
+import SigninPage from "./components/SigninPage";
 import SignupPage from "./components/SignupPage";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
@@ -16,7 +16,7 @@ function App() {
         <Route path="/" element={<CareerPaths />} />
 
         {/* Sign In page */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<SigninPage/>} />
 
         {/* Sign Up page */}
         <Route path="/signup" element={<SignupPage />} />

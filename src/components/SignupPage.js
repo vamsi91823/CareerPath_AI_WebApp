@@ -8,11 +8,13 @@ import {
   Avatar,
   Alert,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router-dom";
 import logo from "../Careerpath-logo.svg";
 import TopRightSignOut from "./TopRightSignOut";
+import { signUpUser } from "../Services/userService";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -22,12 +24,17 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState(""); // "", "error", "mismatch", "success"
 
-  const handleSubmit = (e) => {
+  const [message, setMessage] = useState(""); // error | mismatch | success
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setApiError("");
 
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password) {
       setMessage("error");
       return;
     }
@@ -37,12 +44,28 @@ export default function SignupPage() {
       return;
     }
 
-    setMessage("success");
+    const payload = {
+      firstName,
+      lastName,
+      email,
+      password,
+      displayName: `${firstName} ${lastName}`,
+    };
 
-    setTimeout(() => {
-      // after creating account you can go to profile wizard
-      navigate("/profile");
-    }, 800);
+    try {
+      setLoading(true);
+      const res = await signUpUser(payload);
+      localStorage.setItem("token", res.token);
+      setMessage("success");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (err) {
+      setApiError(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,86 +81,50 @@ export default function SignupPage() {
     >
       <TopRightSignOut />
       <Box sx={{ width: 420 }}>
-        {/* Back to Home */}
+        {/* Back */}
         <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 1,
-            cursor: "pointer",
-            width: "fit-content",
-          }}
+          sx={{ display: "flex", alignItems: "center", mb: 1, cursor: "pointer" }}
           onClick={() => navigate("/")}
         >
           <IconButton size="small">
             <ArrowBackIosNewIcon fontSize="small" />
           </IconButton>
-          <Typography
-            sx={{ fontFamily: "Quicksand", fontSize: 14, ml: -0.5 }}
-          >
+          <Typography sx={{ fontFamily: "Quicksand", fontSize: 14, ml: -0.5 }}>
             Back to Home
           </Typography>
         </Box>
 
-        {/* Logo & Title */}
+        {/* Logo */}
         <Box textAlign="center" mb={3}>
           <Avatar
             src={logo}
-            sx={{
-              width: 80,
-              height: 80,
-              margin: "0 auto",
-              borderRadius: 4,
-              boxShadow: 3,
-            }}
+            sx={{ width: 80, height: 80, margin: "0 auto", borderRadius: 4 }}
           />
-
           <Typography
             variant="h4"
-            sx={{ mt: 2, fontFamily: "'Pacifico', cursive", color: "#000" }}
+            sx={{ mt: 2, fontFamily: "'Pacifico', cursive" }}
           >
             CareerPath AI
           </Typography>
-
           <Typography sx={{ color: "gray", fontFamily: "Quicksand" }}>
             Create your account to start your journey
           </Typography>
         </Box>
 
-        {/* Card */}
-        <Card sx={{ p: 3, borderRadius: 3, boxShadow: 4 }}>
-          <Typography
-            variant="h5"
-            sx={{
-              mb: 1,
-              textAlign: "center",
-              fontFamily: "Quicksand",
-              fontWeight: 700,
-            }}
-          >
+        <Card sx={{ p: 3, borderRadius: 3 }}>
+          <Typography variant="h5" textAlign="center" mb={2}>
             Create Account
-          </Typography>
-          <Typography
-            sx={{
-              mb: 2,
-              textAlign: "center",
-              color: "gray",
-              fontFamily: "Quicksand",
-              fontSize: 14,
-            }}
-          >
-            Join CareerPath AI and get personalized career recommendations.
           </Typography>
 
           {/* Alerts */}
           {message === "error" && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              Please fill in all fields.
+              Please fill in all required fields.
             </Alert>
           )}
           {message === "mismatch" && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              Password and Confirm Password do not match.
+              Passwords do not match.
             </Alert>
           )}
           {message === "success" && (
@@ -145,36 +132,34 @@ export default function SignupPage() {
               Account created successfully! Redirecting...
             </Alert>
           )}
+          {apiError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {apiError}
+            </Alert>
+          )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
             <TextField
               label="First Name"
-              placeholder="John"
               fullWidth
               margin="normal"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
             />
-
             <TextField
               label="Last Name"
-              placeholder="Doe"
               fullWidth
               margin="normal"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
             />
-
             <TextField
               label="Email"
-              placeholder="you@example.com"
               fullWidth
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-
             <TextField
               type="password"
               label="Password"
@@ -183,7 +168,6 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
             <TextField
               type="password"
               label="Confirm Password"
@@ -196,39 +180,25 @@ export default function SignupPage() {
             <Button
               fullWidth
               type="submit"
+              disabled={loading}
               sx={{
                 mt: 3,
                 py: 1.5,
                 background: "linear-gradient(to right, #1976d2, #00b0ff)",
                 color: "#fff",
-                fontSize: "16px",
-                borderRadius: 2,
                 textTransform: "none",
-                "&:hover": {
-                  background: "linear-gradient(to right, #1259a8, #008ccd)",
-                },
               }}
             >
-              Create Account
+              {loading ? <CircularProgress size={22} /> : "Create Account"}
             </Button>
           </form>
         </Card>
 
-        {/* Footer text */}
-        <Typography
-          textAlign="center"
-          mt={2}
-          sx={{ fontFamily: "Quicksand", color: "gray" }}
-        >
+        <Typography textAlign="center" mt={2} sx={{ color: "gray" }}>
           Already have an account?
           <span
             onClick={() => navigate("/login")}
-            style={{
-              color: "#1976d2",
-              marginLeft: 5,
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
+            style={{ color: "#1976d2", marginLeft: 5, cursor: "pointer" }}
           >
             Sign in
           </span>
