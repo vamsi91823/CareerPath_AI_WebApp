@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CareerPaths from "./components/CareerPaths";
 import SigninPage from "./components/SigninPage";
 import SignupPage from "./components/SignupPage";
-import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import ProfilePage from "./components/ProfilePage";
 

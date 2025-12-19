@@ -41,7 +41,7 @@ async function getCareerRecommendations(profile) {
     });
 
     if (!res.ok) {
-      const text = await res.text();
+     // const text = await res.text();
       return defaultData;
       // throw new Error(`Server error: ${res.status} ${text}`);
     }
