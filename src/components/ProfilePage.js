@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import CreateProfile from "./CreateProfile";
 import ProfileView from "./ProfileView";
-import { getProfile } from "../Services/profileService";
 import Profile from "./Profile";
 import { fetchUserProfileDetails } from "../Services/userService";
 
