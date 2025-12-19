@@ -55,10 +55,7 @@ export default function CareerRecommendation({ profile }) {
                   <Typography variant="body2" color="text.secondary">{r.explanation}</Typography>
                 </Box>
 
-                <Stack alignItems="flex-end" spacing={1}>
-                  <Chip label={`Confidence: ${Math.round((r.confidence || 0) * 100)}%`} size="small" />
-                  <Typography variant="caption" color="text.secondary">{(r.targetRoles || []).join(", ")}</Typography>
-                </Stack>
+            
               </Stack>
 
               <Stack spacing={1} sx={{ mt: 1 }}>
