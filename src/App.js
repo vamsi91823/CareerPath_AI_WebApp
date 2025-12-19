@@ -7,6 +7,7 @@ import SigninPage from "./components/SigninPage";
 import SignupPage from "./components/SignupPage";
 import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
+import ProfilePage from "./components/ProfilePage";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
 
         {/* Profile wizard (after sign up) */}
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<ProfilePage  />} />
         {/* Dashboard overview */}
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>

@@ -71,6 +71,9 @@ export async function fetchUserProfileDetails() {
       "Content-Type": "application/json",
       Authorization: token ? `Bearer ${token}` : "",
     },
+    body: JSON.stringify({
+    firebaseUid : localStorage.getItem("uid")
+  }),
     credentials: "include", // allows httpOnly cookie auth
   });
 

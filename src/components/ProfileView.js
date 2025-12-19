@@ -1,79 +1,106 @@
-﻿import React, { useEffect, useState } from "react";
-import { Box, Card, Typography, Button, Avatar } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import TopRightSignOut from "./TopRightSignOut";
-import logo from "../Careerpath-logo.svg";
-import { getProfileDetails } from "../Services/userService";
+﻿import React from "react";
+import {
+  Box,
+  Card,
+  Avatar,
+  Typography,
+  Button,
+  Grid,
+  TextField,
+} from "@mui/material";
 
-export default function ProfileView() {
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await getProfileDetails();
-        if (!mounted) return;
-        setProfile(res && Object.keys(res).length ? res : null);
-      } catch (e) {
-        setProfile(null);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
-
-  if (loading) return null;
-
-  // If no profile yet, go to profile creation flow
-  if (!profile) {
-    navigate("/profile");
-    return null;
-  }
-
+export default function ProfileSettings({ profile, onEdit }) {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(to bottom right, #f7fbfc, #e6f7ff)",
-        p: 2,
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #eaf1ff, #fdf6e3)",
       }}
     >
-      <TopRightSignOut />
-      <Card sx={{ p: 4, width: 560, borderRadius: 3 }}>
-        <Box textAlign="center" mb={2}>
-          <Avatar src={logo} sx={{ width: 72, height: 72, margin: "0 auto", mb: 1 }} />
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            {profile.fullName || `${profile.firstName || ""} ${profile.lastName || ""}`}
-          </Typography>
-          <Typography color="text.secondary">{profile.email}</Typography>
-        </Box>
+      
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2">Education</Typography>
-          <Typography>{profile.education || "Not provided"}</Typography>
-        </Box>
+      {/* Main Content */}
+      <Box sx={{ flex: 1, p: 4 }}>
+        <Card sx={{ borderRadius: 4, overflow: "hidden" }}>
+          
+          {/* Header */}
+          <Box
+            sx={{
+              height: 120,
+              background: "linear-gradient(90deg, #7aa2ff, #ffd6a5)",
+            }}
+          />
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle2">Address</Typography>
-          <Typography>{profile.address || "Not provided"}</Typography>
-        </Box>
+          {/* Profile Header */}
+          <Box sx={{ p: 4, display: "flex", alignItems: "center" }}>
+            <Avatar
+              sx={{
+                width: 70,
+                height: 70,
+                mr: 2,
+                mt: "-60px",
+                border: "4px solid white",
+                bgcolor: "#4f6bed",
+              }}
+            >
+              {profile.firstName?.[0]}
+            </Avatar>
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 3 }}>
-          <Button variant="outlined" sx={{ mr: 1 }} onClick={() => navigate('/dashboard')}>
-            Dashboard
-          </Button>
-          <Button variant="contained" onClick={() => navigate('/profile')}>
-            Edit Profile
-          </Button>
-        </Box>
-      </Card>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6">
+                {profile.firstName} {profile.lastName}
+              </Typography>
+              <Typography color="text.secondary">
+                {profile.email}
+              </Typography>
+            </Box>
+
+            <Button
+              variant="contained"
+              sx={{ bgcolor: "#4f6bed", textTransform: "none" }}
+              onClick={onEdit}
+            >
+              Edit
+            </Button>
+          </Box>
+
+          {/* View-Only Fields */}
+          <Box sx={{ p: 4, pt: 0 }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="First Name"
+                  value={profile.firstName}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <TextField
+                  label="Last Name"
+                  value={profile.lastName}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                />
+              </Grid>
+             
+            </Grid>
+
+            {/* Email Section */}
+            <Box sx={{ mt: 5 }}>
+              <Typography fontWeight={600}>
+                My Email Address
+              </Typography>
+
+              <Typography color="text.secondary" sx={{ mt: 1 }}>
+                {profile.email}
+              </Typography>
+            </Box>
+          </Box>
+        </Card>
+      </Box>
     </Box>
   );
 }
